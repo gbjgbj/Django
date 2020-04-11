@@ -1,5 +1,19 @@
 Django的缓存配置
 
+首先--mysql数据库配置
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'AXF',
+        'USER': 'root',
+        'PASSWORD': 'gbj',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+
 1.创建缓存表
 -----python manage.py createcachetable [table_name]
 
