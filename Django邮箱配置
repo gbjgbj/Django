@@ -1,0 +1,26 @@
+1.settings配置
+
+"""邮件服务器配置"""
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '2365489060@qq.com'
+EMAIL_HOST_PASSWORD = 'clvrhxryslnrebca'  # 第三方登录验证码
+
+SERVICE_HOST = '127.0.0.1'
+SERVICE_PORT = '9000'
+
+2.函数
+def send_email_activate(username, receive, u_token):
+    subject = 'AXF {}'.format(username)  # 标题
+    from_email = EMAIL_HOST_USER  # 发件人
+    recipient_list = [receive, ]  # 收件人列表
+
+    data = {
+        'username': username,
+        'activate_url': 'http://{}:{}/axf/activate/?u_token={}'.format(SERVICE_HOST, SERVICE_PORT, u_token),
+    }
+
+    html_message = loader.get_template('user/activate.html').render(data)
+
+    send_mail(subject=subject, message="", html_message=html_message, from_email=from_email, recipient_list=recipient_list)
+    return HttpResponse('Send success')
