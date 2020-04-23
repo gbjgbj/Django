@@ -1,0 +1,49 @@
+项目settings中添加
+      CELERY_BROKER_URL = 'redis://localhost:6379/1'
+      CELERY_TASK_SERIALIZER = 'json'
+      CELERY_ACCEPT_CONTENT = ['json']
+      CELERY_RESULT_BACKEND = 'django-db'
+
+INSTALLED_APPS中添加
+      django_celery_results
+      
+生成迁移表 python manage.oy migrate django_celery_results
+
+对于缓存后端，您可以使用：
+CELERY_CACHE_BACKEND = 'django-cache'
+我们还可以使用django的CACHES设置中定义的缓存。
+# celery setting.
+CELERY_CACHE_BACKEND = 'default'
+# django setting.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
+
+
+
+
+在项目settings同级目录下创建celery.py
+import os
+from celery import Celery
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'end.settings')
+
+app = Celery('end')
+
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+app.autodiscover_tasks()
+
+@app.task(bind=True)
+def debug_task(self):
+    print('Request: {0!r}'.format(self.request))
+    
+    
+    
+在项目settings统计目录下的__init__.py文件里添加
+from .celery import app as celery_app
+
+__all__ = ['celery_app']
