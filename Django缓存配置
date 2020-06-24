@@ -39,3 +39,20 @@ CACHES = {
         },
     },
 } 
+
+
+
+redis  session配置
+	SESSION_ENGINE = 'redis_sessions.session'
+	SESSION_REDIS_HOST = 'localhost'
+	SESSION_REDIS_PORT = 6379
+	SESSION_REDIS_DB = 2
+	SESSION_REDIS_PASSWORD = ''
+	SESSION_REDIS_PREFIX = 'session'
+
+
+	SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+	SESSION_COOKIE_NAME = 'SESSION_ID'
+	SESSION_COOKIE_PATH = '/'
+	SESSION_CACHE_ALIAS = 'default'
+	SESSION_COOKIE_AGE = 1209600  # 两周有效时间
