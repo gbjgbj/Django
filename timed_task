@@ -1,0 +1,81 @@
+
+class StartTimedTask(object):
+    # 实例化调度器
+    scheduler = BackgroundScheduler()
+
+    # 实例化存储器(redis)
+    second_redis_jobstore = RedisJobStore(db=2, host="127.0.0.1", port=6379)
+    # 添加存储器
+    scheduler.add_jobstore(second_redis_jobstore)
+
+    # 实例化执行器
+    # thread_executor = ThreadPoolExecutor()
+    # 添加执行器
+    # self.scheduler.add_executor(thread_executor)
+
+    # 运行
+    scheduler.start()
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return '正在执行任务数-%s -> %s' % (len(self.scheduler.get_jobs()), [i.name for i in self.scheduler.get_jobs()])
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__module__, self.__class__.__name__)
+
+    # 监听事件函数
+    def _job_execute(self, event):
+        """job执行成功"""
+        print('%s--%s执行成功, 当前任务队列大小 -> %s, 正在执行任务 -> %s' % (event.code, event.job_id,
+                                                            len(self.scheduler.get_jobs()),
+                                                            [i.name for i in self.scheduler.get_jobs()]))
+
+    def _job_error(self, job_id):
+        """job发生错误"""
+        print('%s发生错误' % job_id)
+        self.scheduler.remove_job(job_id)
+        if not self.scheduler.get_jobs():
+            self.scheduler.shutdown()
+
+    def _job_added(self, event):
+        """添加job时"""
+        print('%s--%s已填加任务队列' % (event.code, event.job_id))
+
+    def add_listener_event(self):
+        self.scheduler.add_listener(self._job_added, EVENT_JOB_ADDED)
+        self.scheduler.add_listener(self._job_execute, EVENT_JOB_EXECUTED)
+
+    def up_lear(self):
+        job_id = 'my_job1'
+        try:
+            if self.scheduler.get_job(job_id):
+                self.scheduler.remove_job(job_id)
+
+            self.scheduler.add_job(my_job1, trigger=CronTrigger(month=3), id=job_id,
+                                   max_instances=1,
+                                   replace_existing=True, kwargs=self.kwargs)
+
+        except Exception as e:
+            print(e)
+            self._job_error(job_id)
+
+    def down_lear(self):
+        job_id = 'my_job2'
+        try:
+            if self.scheduler.get_job(job_id):
+                self.scheduler.remove_job(job_id)
+
+            self.scheduler.add_job(my_job2, trigger=CronTrigger(month=7), id=job_id,
+                                   max_instances=1,
+                                   replace_existing=True, kwargs=self.kwargs)
+        except Exception as e:
+            print(e)
+            self._job_error(job_id)
+
+    def run(self):
+        """启动定时任务"""
+        self.add_listener_event()
+        self.down_lear()
+        self.up_lear()
