@@ -1,0 +1,8 @@
+转到bin目录
+mysqld --install   # 安装
+mysqld --initialize  --console   # 初始化
+net  start mysql   # 启动mysql
+mysql  -u root -p ...   # 登录
+alter user 'root'@'localhost'  identified by 'root';   # 修改密码
+update user set password=password('123') where user = 'root';  # 刷新密码
+flush  privileges;  # 刷新权限
